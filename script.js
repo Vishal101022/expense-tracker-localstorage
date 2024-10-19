@@ -1,54 +1,119 @@
-const form = document.querySelector("form");
-function handleFormSubmit(event) {
+async function handleFormSubmit(event) {
   event.preventDefault();
 
-  const amount = event.target.amount.value;
-  const description = event.target.description.value;
-  const category = event.target.category.value;
-  // reset form fields
-  event.target.amount.value = "";
-  event.target.description.value = "";
-  event.target.category.value = "select category";
-
-  const expenseTracker = {
-    amount,
-    description,
-    category,
+  const expenseData = {
+    amount: event.target.amount.value,
+    description: event.target.description.value,
+    category: event.target.category.value,
   };
-  // taken description as key and expenseTracker as value in localStorage
-  localStorage.setItem(description, JSON.stringify(expenseTracker));
 
-  let list = document.createElement("li");
-  list.textContent = `${amount} - ${description} - ${category}`;
-  // create delete btn
-  const deleteButton = document.createElement("button");
-  deleteButton.textContent = "Delete Expense";
-  deleteButton.classList.add("delete-btn");
-  list.appendChild(deleteButton);
-  deleteButton.addEventListener("click", handleDelete);
-  // create edit btn
-  const editButton = document.createElement("button");
-  editButton.textContent = "Edit Expense";
-  editButton.classList.add("edit-btn");
-  list.appendChild(editButton);
-  editButton.addEventListener("click", handleEdit);
-
-  const unorderList = document.querySelector("ul");
-  unorderList.appendChild(list);
-
-  function handleDelete(e) {
-    const li = e.target.parentElement;
-    unorderList.removeChild(li);
-    localStorage.removeItem(description);
+  
+  //axios post api
+  try {
+    console.log("inside post api");
+    const response = await axios.post();
+    console.log(response);
+  } catch (err) {
+    console.log("Error:", err.message);
   }
 
-  function handleEdit(e) {
-    const li = e.target.parentElement;
-    const expenseTracker = JSON.parse(localStorage.getItem(description));
-    document.querySelector("#amount").value = expenseTracker.amount;
-    document.querySelector("#description").value = expenseTracker.description;
-    document.querySelector("#category").value = expenseTracker.category;
-    unorderList.removeChild(li);
-    localStorage.removeItem(expenseTracker.description);
+  // reset form fields
+  document.getElementById("amount").value = "";
+  document.getElementById("description").value = "";
+  document.getElementById("category").value = "Select Category";
+
+  // reload the page
+  window.location.reload();
+}
+
+// get api
+window.addEventListener("DOMContentLoaded", async () => {
+  try {
+    console.log("inside get api");
+    const response = await axios.get();
+    for (let i = 0; i < response.data.length; i++) {
+      displayDataOnScreen(response.data[i]);
+    }
+  } catch (error) {
+    console.log("Error:", error.message);
+  }
+});
+
+function displayDataOnScreen(expenseData) {
+  const list = document.createElement("li");
+  list.appendChild(
+    document.createTextNode(
+      `${expenseData.amount}    ${expenseData.description}    ${expenseData.category}`
+    )
+  );
+  const deleteBtn = document.createElement("button");
+  deleteBtn.appendChild(document.createTextNode("Delete"));
+  list.appendChild(deleteBtn);
+
+  const editBtn = document.createElement("button");
+  editBtn.appendChild(document.createTextNode("Edit"));
+  list.appendChild(editBtn);
+
+  const expenseList = document.querySelector("ul");
+  expenseList.appendChild(list);
+
+  deleteBtn.addEventListener("click", (event) => {
+    handleDelete(event, expenseList, expenseData);
+  });
+
+  editBtn.addEventListener("click", (event) => {
+    document.getElementById("amount").value = expenseData.amount;
+    document.getElementById("description").value = expenseData.description;
+    document.getElementById("category").value = expenseData.category;
+    expenseList.removeChild(event.target.parentElement);
+    // Handle the edit submission
+    const submitBtn = document.querySelector("form button");
+    submitBtn.innerText = "Update";
+
+    submitBtn.onclick = (event) => {
+      event.preventDefault();
+      expenseData.amount = document.getElementById("amount").value;
+      expenseData.description = document.getElementById("description").value;
+      expenseData.category = document.getElementById("category").value;
+
+      handleEdit(expenseData);
+      submitBtn.innerText = "Submit";
+      document.getElementById("amount").value = "";
+      document.getElementById("description").value = "";
+      document.getElementById("category").value = "";
+
+      displayDataOnScreen(expenseData);
+    };
+  });
+}
+
+async function handleDelete(event, unorderList, expenseData) {
+  unorderList.removeChild(event.target.parentElement);
+  deleteData(expenseData);
+}
+
+// update api
+async function handleEdit(expenseData) {
+  console.log("inside edit api");
+  try {
+    const response = await axios.patch(``, {
+      amount: expenseData.amount,
+      description: expenseData.description,
+      category: expenseData.category,
+    });
+    console.log(response);
+  } catch (error) {
+    console.log("Error: ", error.message);
+  }
+}
+
+// delete api
+async function deleteData(expenseData) {
+  console.log("inside delete api");
+  try {
+    const response = await axios.delete(``);
+    console.log(response);
+  } catch (error) {
+    console.log("Error:", error.message);
   }
 }
