@@ -11,7 +11,7 @@ async function handleFormSubmit(event) {
   //axios post api
   try {
     console.log("inside post api");
-    const response = await axios.post();
+    const response = await axios.post("http://localhost:3000/api/expense", expenseData);
     console.log(response);
   } catch (err) {
     console.log("Error:", err.message);
@@ -30,7 +30,7 @@ async function handleFormSubmit(event) {
 window.addEventListener("DOMContentLoaded", async () => {
   try {
     console.log("inside get api");
-    const response = await axios.get();
+    const response = await axios.get("http://localhost:3000/api/expenses");
     for (let i = 0; i < response.data.length; i++) {
       displayDataOnScreen(response.data[i]);
     }
@@ -96,7 +96,7 @@ async function handleDelete(event, unorderList, expenseData) {
 async function handleEdit(expenseData) {
   console.log("inside edit api");
   try {
-    const response = await axios.patch(``, {
+    const response = await axios.patch(`http://localhost:3000/api/expense/${expenseData.id}`, {
       amount: expenseData.amount,
       description: expenseData.description,
       category: expenseData.category,
@@ -111,7 +111,7 @@ async function handleEdit(expenseData) {
 async function deleteData(expenseData) {
   console.log("inside delete api");
   try {
-    const response = await axios.delete(``);
+    const response = await axios.delete(`http://localhost:3000/api/expense/${expenseData.id}`);
     console.log(response);
   } catch (error) {
     console.log("Error:", error.message);
