@@ -19,15 +19,16 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use('/api', router);
 
-async function testConnection() { 
+// test connection
+async function testConnection() {
     try {
-        const connection = await db.getConnection();
-        console.log("Database connected successfully");
-        connection.release();
-    } catch (err) {
-        console.log("Error connecting to database: ", err.message);
+        await db.authenticate();
+        console.log("Connection has been established successfully.");
+    } catch (error) {
+        console.error("Unable to connect to the database:", error);
     }
 }
+
 testConnection();
 
 app.listen(3000, () => {
