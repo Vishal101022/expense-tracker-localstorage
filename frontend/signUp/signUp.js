@@ -9,8 +9,50 @@ async function handerFormSubmit(e) {
   };
 
   try {
-    await axios.post("http://localhost:3000/api/signup", signUpDetails);
+    if (
+      signUpDetails.name == "" ||
+      signUpDetails.email == "" ||
+      signUpDetails.password == ""
+    ) {
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "error",
+        text: "Please fill all the fields",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+      return;
+    }
+    await axios.post("http://localhost:3000/signup", signUpDetails);
+
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: "success",
+      text: "Account created successfully",
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true,
+    });
   } catch (err) {
     console.log("Error:", err.message);
+    if (err.response.status == 422) {
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "error",
+        text: "Email already exists",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+    }
   }
+
+  // clear form fields
+  document.getElementById("name").value = "";
+  document.getElementById("email").value = "";
+  document.getElementById("password").value = "";
 }
