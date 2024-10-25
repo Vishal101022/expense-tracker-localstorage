@@ -3,8 +3,8 @@ const exModel = require("../models/expenseModel");
 // create new expenses
 exports.createExpense = async (req, res) => {
   try {
-    const expenseData = req.body;
-    const response = await exModel.createExpense(expenseData);
+    const { amount, description, category} = req.body;
+    const response = await exModel.create({amount, description, category});
     res.status(201).json(response);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -14,7 +14,9 @@ exports.createExpense = async (req, res) => {
 // get all expenses
 exports.getExpenses = async (req, res) => {
     try {
-        const response = await exModel.getExpenses();
+      const response = await exModel.findAll({
+            attributes: ["id", "amount", "description", "category"],
+        });
         res.status(200).json(response);
     } catch (err) { 
         res.status(500).json({ error: err.message });
@@ -25,7 +27,7 @@ exports.getExpenses = async (req, res) => {
 exports.deleteExpense = async (req, res) => {
     try {
       const { id } = req.params;
-      await exModel.deleteExpense(id);
+      await exModel.destroy({ where: { id } });
     res.status(200).json({message: "Expense deleted successfully"});
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -36,8 +38,8 @@ exports.deleteExpense = async (req, res) => {
 exports.updateExpense = async (req, res) => {
   try {
     const { id } = req.params;
-    const expenseData = req.body;
-    const response = await exModel.updateExpense(id, expenseData);
+    const { amount, description, category} = req.body;
+    const response = await exModel.update({amount, description, category}, {where: {id}});
     res.status(200).json(response);
   } catch (err) {
     res.status(500).json({ error: err.message });
