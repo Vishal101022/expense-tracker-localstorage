@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const db = require("./util/db");
 const router = require("./routes/expenseRoutes");
+const userRouter = require("./routes/userRoutes");
 
 const corsOptions = {
     origin: [
@@ -18,6 +19,8 @@ const app = express();
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use('/api', router);
+app.use('/', userRouter);
+
 
 // test connection
 async function testConnection() {
