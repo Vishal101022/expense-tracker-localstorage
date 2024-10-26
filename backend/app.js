@@ -4,6 +4,7 @@ const cors = require("cors");
 const db = require("./util/db");
 const router = require("./routes/expenseRoutes");
 const userRouter = require("./routes/userRoutes");
+const loginRouter = require("./routes/loginRoutes");
 
 const corsOptions = {
     origin: [
@@ -20,7 +21,7 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use('/api', router);
 app.use('/', userRouter);
-
+app.use('/', loginRouter);
 
 // test connection
 async function testConnection() {
