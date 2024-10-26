@@ -15,7 +15,7 @@ async function handerFormSubmit(e) {
         icon: "error",
         text: "Please fill all the fields",
         showConfirmButton: false,
-        timer: 2000,
+        timer: 3000,
         timerProgressBar: true,
       });
       return;
@@ -27,19 +27,31 @@ async function handerFormSubmit(e) {
       icon: "success",
       text: "Login Successful",
       showConfirmButton: false,
-      timer: 2000,
+      timer: 3000,
       timerProgressBar: true,
     });
   } catch (error) {
-    Swal.fire({
-      toast: true,
-      position: "top-end",
-      icon: "error",
-      text: error.response.data.message,
-      showConfirmButton: false,
-      timer: 2000,
-      timerProgressBar: true,
-    });
+    if (error.response && error.response.status === 401) {
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "error",
+        text: "Invalid email or password",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+      });
+    } if(error.response && error.response.status === 404){
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "error",
+        text: "User not found, please sign up",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+      });
+    }
     }
     
     // clear the form fields
