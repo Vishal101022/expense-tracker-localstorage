@@ -21,15 +21,7 @@ async function handerFormSubmit(e) {
       return;
     }
     await axios.post("http://localhost:3000/login", loginDetails);
-    Swal.fire({
-      toast: true,
-      position: "top-end",
-      icon: "success",
-      text: "Login Successful",
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-    });
+    window.location.href = "../expense/expense.html";
   } catch (error) {
     if (error.response && error.response.status === 401) {
       Swal.fire({
