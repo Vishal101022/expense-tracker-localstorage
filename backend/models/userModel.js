@@ -21,11 +21,10 @@ const User = sequelize.define(
         password: {
             type: DataTypes.STRING,
             allowNull: false,
-        },
+        }, 
     },
     {
-        tableName: "users",
-        timestamps: true,
+        timestamps:true
     }
 );
 module.exports = User;
