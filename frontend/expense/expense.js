@@ -8,11 +8,17 @@ async function handleFormSubmit(event) {
   };
 
   //axios post api
+  
   try {
-    console.log("inside post api");
+    const token= localStorage.getItem("token");
     const response = await axios.post(
       "http://localhost:3000/api/expense",
-      expenseData
+      expenseData,
+      {
+        headers: {
+          Authorization: `${token}`,
+        },
+      }
     );
     console.log(response);
   } catch (err) {
@@ -32,7 +38,11 @@ async function handleFormSubmit(event) {
 window.addEventListener("DOMContentLoaded", async () => {
   try {
     console.log("inside get api");
-    const response = await axios.get("http://localhost:3000/api/expenses");
+    const token= localStorage.getItem("token");
+    const response = await axios.get("http://localhost:3000/api/expenses", {
+      headers: {
+        Authorization: `${token}`,
+    }});
     for (let i = 0; i < response.data.length; i++) {
       displayDataOnScreen(response.data[i]);
     }
