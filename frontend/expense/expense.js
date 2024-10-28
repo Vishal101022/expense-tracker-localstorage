@@ -1,38 +1,3 @@
-async function handleFormSubmit(event) {
-  event.preventDefault();
-
-  const expenseData = {
-    amount: event.target.amount.value,
-    description: event.target.description.value,
-    category: event.target.category.value,
-  };
-
-  //axios post api
-  
-  try {
-    const token= localStorage.getItem("token");
-    const response = await axios.post(
-      "http://localhost:3000/api/expense",
-      expenseData,
-      {
-        headers: {
-          Authorization: `${token}`,
-        },
-      }
-    );
-    console.log(response);
-  } catch (err) {
-    console.log("Error:", err.message);
-  }
-
-  // reset form fields
-  document.getElementById("amount").value = "";
-  document.getElementById("description").value = "";
-  document.getElementById("category").value = "Select Category";
-
-  // reload the page
-  window.location.reload();
-}
 
 // get api
 window.addEventListener("DOMContentLoaded", async () => {
@@ -94,16 +59,22 @@ function displayDataOnScreen(expenseData) {
   });
 
   editBtn.addEventListener("click", (event) => {
+    openModal(expenseData, "Update");
+    itemsContainer.removeChild(event.target.parentElement);
+  }
+   
+  );
+}
+
+// Function to open and set up the modal for "Add" or "Update"
+function openModal(expenseData, mode) {
+  const modal = document.querySelector(".modal");
+  const submitBtn = document.querySelector(".addExpenseBtn");
+
+  if (mode === "Update") {
     document.getElementById("amount").value = expenseData.amount;
     document.getElementById("description").value = expenseData.description;
     document.getElementById("category").value = expenseData.category;
-
-    // Show the modal
-    const modal = document.querySelector(".modal");
-    modal.style.display = "block";
-
-    // Handle the edit submission
-    const submitBtn = document.querySelector("form button");
     submitBtn.innerText = "Update";
 
     submitBtn.onclick = (event) => {
@@ -113,22 +84,92 @@ function displayDataOnScreen(expenseData) {
       expenseData.category = document.getElementById("category").value;
 
       handleEdit(expenseData);
-      submitBtn.innerText = "Add Expense";
-      document.getElementById("amount").value = "";
-      document.getElementById("description").value = "";
-      document.getElementById("category").value = "";
-
-      modal.style.display = "none";
-      window.location.reload();
+      closeModal(expenseData);
+      displayDataOnScreen(expenseData);
     };
-  
-  });
+  } else {
+    submitBtn.onclick = handleAddExpense;
+  }
+  modal.style.display = "block";
 }
 
+// Function to close and reset the modal
+function closeModal(expenseData) {
+  const modal = document.querySelector(".modal");
+  const submitBtn = document.querySelector(".addExpenseBtn");
+
+  modal.style.display = "none";
+  document.getElementById("amount").value = "";
+  document.getElementById("description").value = "";
+  document.getElementById("category").value = "";
+
+  // Remove any existing event listeners on submitBtn
+  submitBtn.onclick = null;
+  submitBtn.innerText = "Add Expense";
+}
+
+// Close modal when clicking outside or on the close button
+document.addEventListener("DOMContentLoaded", modal);
+function modal() {
+  const modal = document.querySelector(".modal");
+  const btn = document.querySelector(".openModal");
+  const span = document.querySelector(".close");
+
+  btn.onclick = function () {
+    // Open modal in Add mode
+    openModal({}, "Add");
+  };
+
+  span.onclick = function () {
+    closeModal();
+  };
+
+  window.onclick = function (event) {
+    if (event.target === modal) {
+      closeModal();
+    }
+  };
+}
+
+// Function to handle adding a new expense
+function handleAddExpense(event) {
+  event.preventDefault();
+  const expenseData = {
+    amount: document.getElementById("amount").value,
+    description: document.getElementById("description").value,
+    category: document.getElementById("category").value,
+  };
+
+  handleSaveExpense(expenseData);
+  displayDataOnScreen(expenseData);
+  closeModal();
+}
 
 async function handleDelete(event, unorderList, expenseData) {
   unorderList.removeChild(event.target.parentElement);
   deleteData(expenseData);
+}
+
+ //axios post api
+async function handleSaveExpense(expenseData) {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.post(
+      "http://localhost:3000/api/expense",
+      expenseData,
+      {
+        headers: {
+          Authorization: `${token}`,
+        },
+      }
+    );
+    console.log(response);
+  } catch (err) {
+    console.log("Error:", err.message);
+  }
+
+  // reload the page
+  //window.location.reload();
 }
 
 // update api
@@ -162,31 +203,4 @@ async function deleteData(expenseData) {
   }
 }
 
-// open modal
-document.addEventListener("DOMContentLoaded", modal);
-// function to operate modal
-function modal() {
-  var modal = document.querySelector(".modal");
-  var btn = document.querySelector(".openModal");
-  var span = document.querySelector(".close");
-  btn.onclick = function () {
-    // reset form fields
-    const submitBtn = document.querySelector("form button");
-    submitBtn.innerText = "Add Expense";
 
-    document.getElementById("amount").value = "";
-    document.getElementById("description").value = "";
-    document.getElementById("category").value = "Select Category";
-    modal.style.display = "block";
-  };
-
-  span.onclick = function () {
-    modal.style.display = "none";
-  };
-
-  window.onclick = function (event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
-    }
-  };
-}
