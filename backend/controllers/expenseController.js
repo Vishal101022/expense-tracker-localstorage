@@ -1,10 +1,13 @@
+const { where } = require("sequelize");
 const exModel = require("../models/expenseModel");
 
 // create new expenses
 exports.createExpense = async (req, res) => {
   try {
-    const { amount, description, category} = req.body;
-    const response = await exModel.create({amount, description, category});
+    const { amount, description, category } = req.body;
+    const UserId = req.user
+    console.log(UserId);
+    const response = await exModel.create({amount, description, category, UserId});
     res.status(201).json(response);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -13,10 +16,9 @@ exports.createExpense = async (req, res) => {
 
 // get all expenses
 exports.getExpenses = async (req, res) => {
-    try {
-      const response = await exModel.findAll({
-            attributes: ["id", "amount", "description", "category"],
-        });
+  try {
+      const UserId = req.user
+      const response = await exModel.findAll({where: {UserId}}, ["id", "amount", "description", "category"]);
         res.status(200).json(response);
     } catch (err) { 
         res.status(500).json({ error: err.message });
