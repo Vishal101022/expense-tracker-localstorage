@@ -1,3 +1,5 @@
+const send = require("send");
+
 async function handerFormSubmit(e) {
   e.preventDefault();
   const form = new FormData(e.target);
@@ -20,8 +22,10 @@ async function handerFormSubmit(e) {
       });
       return;
     }
-    await axios.post("http://localhost:3000/login", loginDetails);
+    const response = await axios.post("http://localhost:3000/login", loginDetails);
+    localStorage.setItem("token", response.data.token);
     window.location.href = "../expense/expense.html";
+     
   } catch (error) {
     if (error.response && error.response.status === 401) {
       Swal.fire({
