@@ -1,10 +1,10 @@
 
 // get api
 window.addEventListener("DOMContentLoaded", async () => {
+  const token= localStorage.getItem("token");
   try {
     console.log("inside get api");
-    const token= localStorage.getItem("token");
-    const response = await axios.get("http://localhost:3000/api/expenses", {
+    const response = await axios.get("http://localhost:3000/expenses", {
       headers: {
         Authorization: `${token}`,
     }});
@@ -12,6 +12,18 @@ window.addEventListener("DOMContentLoaded", async () => {
       displayDataOnScreen(response.data[i]);
     }
   } catch (error) {
+    console.log("Error:", error.message);
+  }
+  // fetch isPremium api
+  try {
+    const response = await axios.get("http://localhost:3000/isPremium", {
+      headers: {
+        Authorization: `${token}`,
+    }});
+    if (response.data.isPremium) {
+      document.querySelector(".premiumBtn").style.display = "none";
+    }
+  }catch (error) {
     console.log("Error:", error.message);
   }
 });
@@ -155,7 +167,7 @@ async function handleSaveExpense(expenseData) {
   try {
     const token = localStorage.getItem("token");
     const response = await axios.post(
-      "http://localhost:3000/api/expense",
+      "http://localhost:3000/expense",
       expenseData,
       {
         headers: {
@@ -177,7 +189,7 @@ async function handleEdit(expenseData) {
   console.log("inside edit api");
   try {
     const response = await axios.patch(
-      `http://localhost:3000/api/expense/${expenseData.id}`,
+      `http://localhost:3000/expense/${expenseData.id}`,
       {
         amount: expenseData.amount,
         description: expenseData.description,
@@ -195,7 +207,7 @@ async function deleteData(expenseData) {
   console.log("inside delete api");
   try {
     const response = await axios.delete(
-      `http://localhost:3000/api/expense/${expenseData.id}`
+      `http://localhost:3000/expense/${expenseData.id}`
     );
     console.log(response);
   } catch (error) {
