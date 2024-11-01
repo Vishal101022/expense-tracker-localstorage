@@ -3,12 +3,15 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const db = require("./util/db");
 // routes
-const router = require("./routes/expenseRoutes");
+const expenseRouter = require("./routes/expenseRoutes");
 const userRouter = require("./routes/userRoutes");
 const loginRouter = require("./routes/loginRoutes");
+const isPremiumRouter = require("./routes/isPremiumRoutes");
+const purchaseRouter = require("./routes/purchaseRoutes");
 // models
 const User = require("./models/userModel");
 const Expense = require("./models/expenseModel");
+const Order = require("./models/orderModel");
 
 const corsOptions = {
     origin: [
@@ -23,9 +26,11 @@ const corsOptions = {
 const app = express();
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
-app.use('/api', router);
+app.use('/', expenseRouter);
 app.use('/', userRouter);
 app.use('/', loginRouter);
+app.use('/', isPremiumRouter);
+app.use('/', purchaseRouter);
 
 
 // test connection
@@ -43,6 +48,8 @@ testConnection();
 User.hasMany(Expense);
 Expense.belongsTo(User);
 
+User.hasMany(Order);
+Order.belongsTo(User);
 
 app.listen(3000, () => {
     console.log("Server started on port 3000");
