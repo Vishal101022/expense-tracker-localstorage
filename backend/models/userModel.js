@@ -22,6 +22,10 @@ const User = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
         }, 
+        isPremiumUser: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
+        }
     },
     {
         timestamps:true
