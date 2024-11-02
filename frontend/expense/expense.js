@@ -1,8 +1,6 @@
-// query selector
 const addIncomeBtn = document.querySelector(".addIncomeBtn");
 const premiumBtn = document.querySelector(".premiumBtn");
 
-// global variables
 let income = 0;
 let totalExpense = 0;
 const token = localStorage.getItem("token");
@@ -21,7 +19,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       displayDataOnScreen(response.data[i]);
       totalExpense += response.data[i].amount;
     }
-    
+
     handleTotalExpense(totalExpense);
     await getTotalIncome();
   } catch (error) {
@@ -37,9 +35,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     });
     if (response.data.isPremium) {
       premiumBtn.style.display = "none";
-    } else {
-      leaderboard.style.display = "block;";
-    }
+    } 
   } catch (error) {
     console.log("Error:", error.message);
   }
@@ -93,9 +89,9 @@ function displayDataOnScreen(expenseData) {
     itemsContainer.removeChild(event.target.parentElement);
   });
 }
+
 // function to add/update total income
 addIncomeBtn.addEventListener("click", addTotalIncome);
-// function to add/update total income
 async function addTotalIncome() {
   const totalIncomeInput = document.querySelector("#total-income");
   const inputValue = totalIncomeInput.value;
@@ -119,15 +115,6 @@ async function addTotalIncome() {
         { amount: inputValue },
         { headers: { Authorization: `${token}` } }
       );
-      Swal.fire({
-        toast: true,
-        position: "top-end",
-        icon: "success",
-        text: "Income added successfully",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-      });
     } else {
       // Update income with a PATCH request
       await axios.patch(
@@ -135,27 +122,9 @@ async function addTotalIncome() {
         { amount: inputValue },
         { headers: { Authorization: `${token}` } }
       );
-      Swal.fire({
-        toast: true,
-        position: "top-end",
-        icon: "success",
-        text: "Income updated successfully",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-      });
     }
-
   } catch (error) {
-    Swal.fire({
-      toast: true,
-      position: "top-end",
-      icon: "error",
-      text: "Failed to add/update income",
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-    });
+    console.log("Error:", error.message);
   }
 }
 
@@ -179,8 +148,8 @@ async function getTotalIncome() {
 
 // function to show total expense
 function handleTotalExpense(total) {
-  const totalIncomeInput = document.querySelector(".total-expense");
-  totalIncomeInput.innerText = `₹ ${parseFloat(total).toFixed(2)}`;
+  const totalexpense = document.querySelector(".total-expense");
+  totalexpense.innerText = `₹ ${parseFloat(total).toFixed(2)}`;
 }
 
 // function to calculate summary
@@ -298,7 +267,7 @@ async function handleDelete(event, unorderList, expenseData) {
 //axios post api
 async function handleSaveExpense(expenseData) {
   try {
-    const response = await axios.post(
+     await axios.post(
       "http://localhost:3000/expense",
       expenseData,
       {
@@ -307,7 +276,6 @@ async function handleSaveExpense(expenseData) {
         },
       }
     );
-    console.log(response);
   } catch (err) {
     console.log("Error:", err.message);
   }
@@ -317,7 +285,7 @@ async function handleSaveExpense(expenseData) {
 async function handleEdit(expenseData) {
   console.log("inside edit api");
   try {
-    const response = await axios.patch(
+    await axios.patch(
       `http://localhost:3000/expense/${expenseData.id}`,
       {
         amount: expenseData.amount,
@@ -325,7 +293,6 @@ async function handleEdit(expenseData) {
         category: expenseData.category,
       }
     );
-    console.log(response);
   } catch (error) {
     console.log("Error: ", error.message);
   }
@@ -333,12 +300,10 @@ async function handleEdit(expenseData) {
 
 // delete api
 async function deleteData(expenseData) {
-  console.log("inside delete api");
   try {
-    const response = await axios.delete(
+    await axios.delete(
       `http://localhost:3000/expense/${expenseData.id}`
     );
-    console.log(response);
   } catch (error) {
     console.log("Error:", error.message);
   }
