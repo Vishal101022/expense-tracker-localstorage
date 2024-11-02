@@ -1,8 +1,6 @@
 const addIncomeBtn = document.querySelector(".addIncomeBtn");
 const premiumBtn = document.querySelector(".premiumBtn");
 
-let income = 0;
-let totalExpense = 0;
 const token = localStorage.getItem("token");
 
 // initialize the loading
@@ -17,11 +15,9 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     for (let i = 0; i < response.data.length; i++) {
       displayDataOnScreen(response.data[i]);
-      totalExpense += response.data[i].amount;
     }
 
-    handleTotalExpense(totalExpense);
-    await getTotalIncome();
+    await getTotalIncome_Expense();
   } catch (error) {
     console.log("Error:", error.message);
   }
@@ -108,76 +104,61 @@ async function addTotalIncome() {
       });
       return;
     }
-    if (addIncomeBtn.innerText === "Add") {
-      // Create income with a POST request
-      await axios.post(
-        "http://localhost:3000/income",
-        { amount: inputValue },
-        { headers: { Authorization: `${token}` } }
-      );
-    } else {
-      // Update income with a PATCH request
+    
+      // income with a patch request
       await axios.patch(
-        "http://localhost:3000/income",
+        "http://localhost:3000/totalincome",
         { amount: inputValue },
         { headers: { Authorization: `${token}` } }
       );
-    }
   } catch (error) {
     console.log("Error:", error.message);
   }
 }
 
-// function to get total income
-async function getTotalIncome() {
+// function to get total income and expense also update summary
+async function getTotalIncome_Expense() {
   const totalIncomeInput = document.querySelector("#total-income");
   try {
-    const response = await axios.get("http://localhost:3000/income", {
+    const response = await axios.get("http://localhost:3000/totals", {
       headers: { Authorization: `${token}` },
     });
 
-    income = response.data?.amount || 0;
-    totalIncomeInput.value = income ? income : 0;
-    addIncomeBtn.innerText = income ? "Update" : "Add";
 
-    calculateSummary();
+    totalIncomeInput.value = response.data.totalIncome || 0;
+    
+    // update summary
+    const date = document.querySelector(".date");
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    const currDate = new Date();
+    const savings = document.querySelector(".savings");
+    const total = response.data.totalIncome - response.data.totalExpense;
+    savings.innerText = `Savings: ₹ ${parseFloat(total).toFixed(2)}`;
+    date.innerText = `${currDate.getDate()} ${
+      monthNames[currDate.getMonth()]
+    } , ${currDate.getFullYear()} - ${currDate.toLocaleString("default", {
+      weekday: "long",
+    })}`;
+
+     // update total expense
+     const totalexpense = document.querySelector(".total-expense");
+     totalexpense.innerText = `₹ ${parseFloat(response.data.totalExpense).toFixed(2)}`;
   } catch (error) {
     console.log("Error:", error.message);
   }
-}
-
-// function to show total expense
-function handleTotalExpense(total) {
-  const totalexpense = document.querySelector(".total-expense");
-  totalexpense.innerText = `₹ ${parseFloat(total).toFixed(2)}`;
-}
-
-// function to calculate summary
-function calculateSummary() {
-  const date = document.querySelector(".date");
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-  const currDate = new Date();
-  const savings = document.querySelector(".savings");
-  const total = income - totalExpense;
-  savings.innerText = `Savings: ₹ ${parseFloat(total).toFixed(2)}`;
-  date.innerText = `${currDate.getDate()} ${
-    monthNames[currDate.getMonth()]
-  } , ${currDate.getFullYear()} - ${currDate.toLocaleString("default", {
-    weekday: "long",
-  })}`;
 }
 
 // Function to open and set up the modal for "Add" or "Update"
@@ -291,6 +272,11 @@ async function handleEdit(expenseData) {
         amount: expenseData.amount,
         description: expenseData.description,
         category: expenseData.category,
+      },
+      {
+        headers: {
+          Authorization: `${token}`,
+        },
       }
     );
   } catch (error) {
@@ -302,7 +288,12 @@ async function handleEdit(expenseData) {
 async function deleteData(expenseData) {
   try {
     await axios.delete(
-      `http://localhost:3000/expense/${expenseData.id}`
+      `http://localhost:3000/expense/${expenseData.id}`,
+      {
+        headers: {
+          Authorization: `${token}`,
+        },
+      }
     );
   } catch (error) {
     console.log("Error:", error.message);
