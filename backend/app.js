@@ -8,6 +8,7 @@ const userRouter = require("./routes/userRoutes");
 const loginRouter = require("./routes/loginRoutes");
 const isPremiumRouter = require("./routes/isPremiumRoutes");
 const purchaseRouter = require("./routes/purchaseRoutes");
+const userIncomeRouter = require("./routes/userIncomeRoutes");
 // models
 const User = require("./models/userModel");
 const Expense = require("./models/expenseModel");
@@ -31,7 +32,7 @@ app.use('/', userRouter);
 app.use('/', loginRouter);
 app.use('/', isPremiumRouter);
 app.use('/', purchaseRouter);
-
+app.use('/', userIncomeRouter);
 
 // test connection
 async function testConnection() {
