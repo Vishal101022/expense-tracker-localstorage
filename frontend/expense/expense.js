@@ -1,16 +1,24 @@
+// global variables
+let income = 0;
+let totalExpense = 0;
+const token = localStorage.getItem("token");
 
-// get api
+// initialize the loading
+// fetch get expense api
 window.addEventListener("DOMContentLoaded", async () => {
-  const token= localStorage.getItem("token");
   try {
-    console.log("inside get api");
     const response = await axios.get("http://localhost:3000/expenses", {
       headers: {
         Authorization: `${token}`,
-    }});
+      },
+    });
+
     for (let i = 0; i < response.data.length; i++) {
       displayDataOnScreen(response.data[i]);
+      totalExpense += response.data[i].amount;
     }
+    handleTotalExpense(totalExpense);
+    await getTotalIncome();
   } catch (error) {
     console.log("Error:", error.message);
   }
@@ -19,15 +27,17 @@ window.addEventListener("DOMContentLoaded", async () => {
     const response = await axios.get("http://localhost:3000/isPremium", {
       headers: {
         Authorization: `${token}`,
-    }});
+      },
+    });
     if (response.data.isPremium) {
       document.querySelector(".premiumBtn").style.display = "none";
     }
-  }catch (error) {
+  } catch (error) {
     console.log("Error:", error.message);
   }
 });
 
+// function to display data on screen
 function displayDataOnScreen(expenseData) {
   const itemsContainer = document.querySelector(".items");
 
@@ -73,9 +83,111 @@ function displayDataOnScreen(expenseData) {
   editBtn.addEventListener("click", (event) => {
     openModal(expenseData, "Update");
     itemsContainer.removeChild(event.target.parentElement);
+  });
+}
+
+// function to get total income
+async function getTotalIncome() {
+  const totalIncomeInput = document.querySelector("#total-income");
+  try {
+    const response = await axios.get("http://localhost:3000/income", {
+      headers: { Authorization: `${token}` },
+    });
+
+    income = response.data.amount;
+    totalIncomeInput.value = income;
+    addIncomeBtn.innerText = income ? "Update" : "Add";
+
+    calculateSummary();
+  } catch (error) {
+    console.log("Error:", error.message);
   }
-   
-  );
+}
+
+// function to show total expense
+function handleTotalExpense(total) {
+  const totalIncomeInput = document.querySelector(".total-expense");
+  totalIncomeInput.innerText = `₹${parseFloat(total).toFixed(2)}`;
+}
+
+// function to add/update total income
+const addIncomeBtn = document.querySelector(".addIncomeBtn");
+addIncomeBtn.addEventListener("click", addTotalIncome);
+// function to add/update total income
+async function addTotalIncome() {
+  const totalIncomeInput = document.querySelector("#total-income");
+  const inputValue = totalIncomeInput.value;
+  try {
+    if (inputValue === "" || isNaN(inputValue)) {
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "error",
+        text: "Please enter a valid amount",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+      });
+      return;
+    }
+    if (addIncomeBtn.innerText === "Add") {
+      // Create income with a POST request
+      await axios.post(
+        "http://localhost:3000/income",
+        { amount: inputValue },
+        { headers: { Authorization: `${token}` } }
+      );
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        text: "Income added successfully",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+      });
+    } else {
+      // Update income with a PATCH request
+      await axios.patch(
+        "http://localhost:3000/income",
+        { amount: inputValue },
+        { headers: { Authorization: `${token}` } }
+      );
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        text: "Income updated successfully",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+      });
+    }
+
+    getTotalIncome();
+  } catch (error) {
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: "error",
+      text: "Failed to add/update income",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+    });
+  }
+}
+// function to calculate summary
+function calculateSummary() {
+  const date = document.querySelector(".date");
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const currDate  = new Date();
+  const savings = document.querySelector(".savings");
+  const total = income - totalExpense;
+  savings.innerText = `Savings: ₹${parseFloat(total).toFixed(2)}`;
+  date.innerText = `${currDate.getDate()} ${
+    monthNames[currDate.getMonth()]
+  } , ${currDate.getFullYear()} - ${currDate.toLocaleString("default", { weekday: "long" })}`;
 }
 
 // Function to open and set up the modal for "Add" or "Update"
@@ -162,10 +274,9 @@ async function handleDelete(event, unorderList, expenseData) {
   deleteData(expenseData);
 }
 
- //axios post api
+//axios post api
 async function handleSaveExpense(expenseData) {
   try {
-    const token = localStorage.getItem("token");
     const response = await axios.post(
       "http://localhost:3000/expense",
       expenseData,
@@ -179,9 +290,6 @@ async function handleSaveExpense(expenseData) {
   } catch (err) {
     console.log("Error:", err.message);
   }
-
-  // reload the page
-  //window.location.reload();
 }
 
 // update api
@@ -214,5 +322,3 @@ async function deleteData(expenseData) {
     console.log("Error:", error.message);
   }
 }
-
-
