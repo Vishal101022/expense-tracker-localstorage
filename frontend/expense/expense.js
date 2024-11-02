@@ -1,3 +1,7 @@
+// query selector
+const addIncomeBtn = document.querySelector(".addIncomeBtn");
+const premiumBtn = document.querySelector(".premiumBtn");
+
 // global variables
 let income = 0;
 let totalExpense = 0;
@@ -17,11 +21,13 @@ window.addEventListener("DOMContentLoaded", async () => {
       displayDataOnScreen(response.data[i]);
       totalExpense += response.data[i].amount;
     }
+    
     handleTotalExpense(totalExpense);
     await getTotalIncome();
   } catch (error) {
     console.log("Error:", error.message);
   }
+
   // fetch isPremium api
   try {
     const response = await axios.get("http://localhost:3000/isPremium", {
@@ -30,7 +36,9 @@ window.addEventListener("DOMContentLoaded", async () => {
       },
     });
     if (response.data.isPremium) {
-      document.querySelector(".premiumBtn").style.display = "none";
+      premiumBtn.style.display = "none";
+    } else {
+      leaderboard.style.display = "block;";
     }
   } catch (error) {
     console.log("Error:", error.message);
@@ -85,33 +93,7 @@ function displayDataOnScreen(expenseData) {
     itemsContainer.removeChild(event.target.parentElement);
   });
 }
-
-// function to get total income
-async function getTotalIncome() {
-  const totalIncomeInput = document.querySelector("#total-income");
-  try {
-    const response = await axios.get("http://localhost:3000/income", {
-      headers: { Authorization: `${token}` },
-    });
-
-    income = response.data.amount;
-    totalIncomeInput.value = income;
-    addIncomeBtn.innerText = income ? "Update" : "Add";
-
-    calculateSummary();
-  } catch (error) {
-    console.log("Error:", error.message);
-  }
-}
-
-// function to show total expense
-function handleTotalExpense(total) {
-  const totalIncomeInput = document.querySelector(".total-expense");
-  totalIncomeInput.innerText = `₹${parseFloat(total).toFixed(2)}`;
-}
-
 // function to add/update total income
-const addIncomeBtn = document.querySelector(".addIncomeBtn");
 addIncomeBtn.addEventListener("click", addTotalIncome);
 // function to add/update total income
 async function addTotalIncome() {
@@ -164,7 +146,6 @@ async function addTotalIncome() {
       });
     }
 
-    getTotalIncome();
   } catch (error) {
     Swal.fire({
       toast: true,
@@ -177,17 +158,57 @@ async function addTotalIncome() {
     });
   }
 }
+
+// function to get total income
+async function getTotalIncome() {
+  const totalIncomeInput = document.querySelector("#total-income");
+  try {
+    const response = await axios.get("http://localhost:3000/income", {
+      headers: { Authorization: `${token}` },
+    });
+
+    income = response.data?.amount || 0;
+    totalIncomeInput.value = income ? income : 0;
+    addIncomeBtn.innerText = income ? "Update" : "Add";
+
+    calculateSummary();
+  } catch (error) {
+    console.log("Error:", error.message);
+  }
+}
+
+// function to show total expense
+function handleTotalExpense(total) {
+  const totalIncomeInput = document.querySelector(".total-expense");
+  totalIncomeInput.innerText = `₹ ${parseFloat(total).toFixed(2)}`;
+}
+
 // function to calculate summary
 function calculateSummary() {
   const date = document.querySelector(".date");
-  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  const currDate  = new Date();
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const currDate = new Date();
   const savings = document.querySelector(".savings");
   const total = income - totalExpense;
-  savings.innerText = `Savings: ₹${parseFloat(total).toFixed(2)}`;
+  savings.innerText = `Savings: ₹ ${parseFloat(total).toFixed(2)}`;
   date.innerText = `${currDate.getDate()} ${
     monthNames[currDate.getMonth()]
-  } , ${currDate.getFullYear()} - ${currDate.toLocaleString("default", { weekday: "long" })}`;
+  } , ${currDate.getFullYear()} - ${currDate.toLocaleString("default", {
+    weekday: "long",
+  })}`;
 }
 
 // Function to open and set up the modal for "Add" or "Update"
@@ -218,7 +239,7 @@ function openModal(expenseData, mode) {
 }
 
 // Function to close and reset the modal
-function closeModal(expenseData) {
+function closeModal() {
   const modal = document.querySelector(".modal");
   const submitBtn = document.querySelector(".addExpenseBtn");
 
