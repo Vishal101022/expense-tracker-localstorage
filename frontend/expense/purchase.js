@@ -1,5 +1,5 @@
-const btn = document.querySelector(".premiumBtn");
-btn.addEventListener("click", premium);
+const premiumBTN = document.querySelector(".premiumBtn");
+premiumBTN.addEventListener("click", premium);
 
 async function premium() {
   const token = localStorage.getItem("token");
