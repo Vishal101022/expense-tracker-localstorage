@@ -1,6 +1,7 @@
 const Razorpay = require("razorpay");
 const orderModel = require("../models/orderModel");
 const userModel = require("../models/userModel");
+const sequelize = require("../util/db");
 const dotenv = require("dotenv");
 const {
   validateWebhookSignature,
@@ -14,14 +15,15 @@ const razorpay = new Razorpay({
 
 const purchasePremium = async (req, res) => {
   const userId = req.user;
-  console.log("userId", userId);
+  const t = await sequelize.transaction();
   try {
     const { amount, currency } = req.body;
 
     const Order = await razorpay.orders.create({
       amount: 20 * 100, // Amount in smallest currency unit
       currency: currency,
-    });
+    }, {
+      transaction: t});
 
     // Save order to the database
     const order = await orderModel.create({
@@ -29,7 +31,8 @@ const purchasePremium = async (req, res) => {
       amount: Order.amount,
       status: "pending",
       UserId: userId,
-    });
+    }, {
+      transaction: t,});
 
     return res.status(201).json({
       id: Order.id,
