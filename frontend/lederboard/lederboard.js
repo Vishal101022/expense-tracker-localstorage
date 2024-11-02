@@ -18,7 +18,7 @@ async function fetchLeaderboard() {
       row.innerHTML = `
       <td>${user.name}
         <td>${index + 1}
-        <td>₹${parseFloat(user.totalExpense).toFixed(2)}
+        <td>₹${parseFloat(user.totalexpense).toFixed(2)}
       `;
       leaderboardTable.appendChild(row);
     });
