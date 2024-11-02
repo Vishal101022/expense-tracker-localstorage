@@ -10,12 +10,11 @@
   <body>
     <div class="header">
       <h2>Day to Day Expenses</h2>
+      <div class="links">
+        <span class="logout"><a href="/frontend/login/login.html">Logout</a></span>
        <span class="premium"> <button class="premiumBtn">Premium </button></span>
-      <nav>
-        <button>Daily</button>
-        <button>Monthly</button>
-        <button>Yearly</button>
-      </nav>
+       <span class="lederboard"><a href="/frontend/lederboard/lederboard.html">Lederboard</a></span>
+      </div>
     </div>
 
     <div class="summary">
@@ -26,11 +25,12 @@
     <div class="income-expense">
       <div class="income">
         <h3>Total Income</h3>
-        <p>₹10,000.00</p>
+        <input type="number" id="total-income" placeholder="₹0.00" />
+        <button type="submit" class="addIncomeBtn">Add Income</button>
       </div>
       <div class="expense">
         <h3>Total Expense</h3>
-        <p>₹4,560.00</p>
+        <p class="total-expense">"₹0.00"</p>
       </div>
     </div>
     <!-- Items here -->
@@ -69,6 +69,9 @@
   </body>
   <script src="expense.js"></script>
   <script src="purchase.js"></script>
+  <!-- Include SweetAlert2 CSS and JS from CDN -->
+   <linkrel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"/>
+   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </html>
