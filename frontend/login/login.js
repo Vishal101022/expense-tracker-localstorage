@@ -1,5 +1,3 @@
-const send = require("send");
-
 async function handerFormSubmit(e) {
   e.preventDefault();
   const form = new FormData(e.target);
