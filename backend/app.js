@@ -9,7 +9,7 @@ const loginRouter = require("./routes/loginRoutes");
 const isPremiumRouter = require("./routes/isPremiumRoutes");
 const purchaseRouter = require("./routes/purchaseRoutes");
 const lederboardRouter = require("./routes/lederboardRoutes");
-
+const forgotPassRouter = require("./routes/forgotPassRoutes");
 // models
 const User = require("./models/userModel");
 const Expense = require("./models/expenseModel");
@@ -34,6 +34,8 @@ app.use('/', loginRouter);
 app.use('/', isPremiumRouter);
 app.use('/', purchaseRouter);
 app.use('/premium', lederboardRouter);
+app.use('/password', forgotPassRouter);
+
 // test connection
 async function testConnection() {
     try {
