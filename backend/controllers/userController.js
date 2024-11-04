@@ -21,3 +21,13 @@ exports.signUp = async (req, res) => {
     }
     
 }
+exports.getUser = async (req, res) => {
+  try {
+      const userId = req.user;
+      console.log("userId",userId);
+    const user = await userModel.findOne({ where: { id: userId } });
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
