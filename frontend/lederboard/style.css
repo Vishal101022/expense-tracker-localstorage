@@ -22,6 +22,18 @@ ul{
     border-radius: 0.5rem;
     background-color:  #dbf7f7;
 }
+.back {
+    color: #1d3557;
+    outline: none;
+    border: none;
+    float: right;
+    text-decoration: none;
+   
+}
+.back:hover {
+    background-color: #1d3557;
+    color: azure;
+}
 .header{
     color: #1d3557;
     font-size: 2.2rem;
