@@ -23,7 +23,7 @@ const Expense = sequelize.define(
     },
   },
   {
-    timestamps: false, 
+    timestamps: true, 
   }
 );
 
