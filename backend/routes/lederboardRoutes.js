@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const lederboardController = require("../controllers/lederboardController");
-const auth = require("../middleware/authMiddleware");
+const premiumAuth = require("../middleware/isPremiumMiddleware");
 
-router.get("/lederboard",auth.isPremium, lederboardController.leaderboard);
+router.get("/lederboard", premiumAuth.isPremium, lederboardController.leaderboard);
 
 module.exports = router
