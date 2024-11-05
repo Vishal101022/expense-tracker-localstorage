@@ -25,9 +25,6 @@ async function premium() {
     );
 
     const order = response.data;
-    console.log("order", order);
-    console.log("response", response);
-
     const options = {
       key: "rzp_test_hdTZLutC1icOMZ",
       amount: order.amount,
