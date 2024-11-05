@@ -18,37 +18,41 @@ const purchasePremium = async (req, res) => {
   const t = await sequelize.transaction();
   try {
     const { amount, currency } = req.body;
-
     const Order = await razorpay.orders.create({
       amount: 20 * 100, // Amount in smallest currency unit
       currency: currency,
-    }, {
-      transaction: t});
+    });
 
     // Save order to the database
-    const order = await orderModel.create({
-      order_id: Order.id,
-      amount: Order.amount,
-      status: "pending",
-      UserId: userId,
-    }, {
-      transaction: t,});
-
+    await orderModel.create(
+      {
+        order_id: Order.id,
+        amount: Order.amount,
+        status: "pending",
+        UserId: userId,
+      },
+      {
+        transaction: t,
+      }
+    );
+    await t.commit();
     return res.status(201).json({
       id: Order.id,
       amount: Order.amount,
       currency: Order.currency,
     });
   } catch (error) {
+    await t.rollback();
+    console.log(error);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 const updateTransactionStatus = async (req, res) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
-        req.body;
-    
-    const userId = req.user
+    req.body;
+
+  const userId = req.user;
 
   try {
     // Validate the payment signature here
@@ -66,7 +70,7 @@ const updateTransactionStatus = async (req, res) => {
     const order = await orderModel.findOne({
       where: { order_id: razorpay_order_id },
     });
-      if (!order) {
+    if (!order) {
       return res.status(404).json({ error: "Order not found" });
     }
 
