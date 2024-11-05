@@ -1,6 +1,10 @@
 const userModel = require("../models/userModel");
+const downloadModel = require("../models/download");
 const exModel = require("../models/expenseModel");
+const s3Service = require("../services/S3Service");
 const sequelize = require("../util/db");
+const { json } = require("body-parser");
+
 
 // create new expenses
 exports.createExpense = async (req, res) => {
@@ -157,3 +161,34 @@ exports.getTotals = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+exports.postexpenseDownload = async (req, res) => {
+  const t = await sequelize.transaction();
+  try {
+    const UserId = req.user;
+    console.log("User id", UserId);
+    const result = await exModel.findAll({ where: { UserId } });
+    expenseData = JSON.stringify(result);
+
+    const filename = `Expense${UserId}/${new Date().toISOString()}.txt`;
+    const url= await s3Service.uploadFileToS3(expenseData, filename);
+    await downloadModel.create({ url, UserId }, { transaction: t });
+    await t.commit();
+    res.status(200).json({ url });
+  } catch (error) {
+    await t.rollback();
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
+exports.getexpenseDownload = async (req, res) => {
+  try {
+    const UserId = req.user;
+    const result = await downloadModel.findAll({ where: { UserId } });
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
