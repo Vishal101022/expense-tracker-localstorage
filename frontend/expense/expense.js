@@ -30,8 +30,11 @@ window.addEventListener("DOMContentLoaded", async () => {
       },
     });
     if (response.data.isPremium) {
-      premiumBtn.style.display = "none";
-    } 
+      premiumBtn.innerText = "Premium User";
+      premiumBtn.disabled = true;
+    }else{
+      premiumBtn.innerText = "Get Premium";
+    }
   } catch (error) {
     console.log("Error:", error.message);
   }
@@ -104,13 +107,24 @@ async function addTotalIncome() {
       });
       return;
     }
-    
-      // income with a patch request
-      await axios.patch(
-        "http://localhost:3000/totalincome",
-        { amount: inputValue },
-        { headers: { Authorization: `${token}` } }
-      );
+
+    // income with a patch request
+    const response = await axios.patch(
+      "http://localhost:3000/totalincome",
+      { amount: inputValue },
+      { headers: { Authorization: `${token}` } }
+    );
+    if (response.status === 200) {
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        text: "Total Income Updated",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+      });
+    }
   } catch (error) {
     console.log("Error:", error.message);
   }
@@ -124,9 +138,8 @@ async function getTotalIncome_Expense() {
       headers: { Authorization: `${token}` },
     });
 
-
     totalIncomeInput.value = response.data.totalIncome || 0;
-    
+
     // update summary
     const date = document.querySelector(".date");
     const monthNames = [
@@ -153,9 +166,11 @@ async function getTotalIncome_Expense() {
       weekday: "long",
     })}`;
 
-     // update total expense
-     const totalexpense = document.querySelector(".total-expense");
-     totalexpense.innerText = `₹ ${parseFloat(response.data.totalExpense).toFixed(2)}`;
+    // update total expense
+    const totalexpense = document.querySelector(".total-expense");
+    totalexpense.innerText = `₹ ${parseFloat(
+      response.data.totalExpense
+    ).toFixed(2)}`;
   } catch (error) {
     console.log("Error:", error.message);
   }
@@ -248,15 +263,11 @@ async function handleDelete(event, unorderList, expenseData) {
 //axios post api
 async function handleSaveExpense(expenseData) {
   try {
-     await axios.post(
-      "http://localhost:3000/expense",
-      expenseData,
-      {
-        headers: {
-          Authorization: `${token}`,
-        },
-      }
-    );
+    await axios.post("http://localhost:3000/expense", expenseData, {
+      headers: {
+        Authorization: `${token}`,
+      },
+    });
   } catch (err) {
     console.log("Error:", err.message);
   }
@@ -287,14 +298,11 @@ async function handleEdit(expenseData) {
 // delete api
 async function deleteData(expenseData) {
   try {
-    await axios.delete(
-      `http://localhost:3000/expense/${expenseData.id}`,
-      {
-        headers: {
-          Authorization: `${token}`,
-        },
-      }
-    );
+    await axios.delete(`http://localhost:3000/expense/${expenseData.id}`, {
+      headers: {
+        Authorization: `${token}`,
+      },
+    });
   } catch (error) {
     console.log("Error:", error.message);
   }
