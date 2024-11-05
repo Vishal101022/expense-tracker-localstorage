@@ -10,10 +10,12 @@ const isPremiumRouter = require("./routes/isPremiumRoutes");
 const purchaseRouter = require("./routes/purchaseRoutes");
 const lederboardRouter = require("./routes/lederboardRoutes");
 const forgotPassRouter = require("./routes/forgotPassRoutes");
+const downloadRouter = require("./routes/expenseRoutes")
 // models
 const User = require("./models/userModel");
 const Expense = require("./models/expenseModel");
 const Order = require("./models/orderModel");
+const download = require("./models/download");
 
 const corsOptions = {
     origin: [
@@ -35,6 +37,7 @@ app.use('/', isPremiumRouter);
 app.use('/', purchaseRouter);
 app.use('/premium', lederboardRouter);
 app.use('/password', forgotPassRouter);
+app.use('/', downloadRouter);
 
 // test connection
 async function testConnection() {
@@ -53,6 +56,9 @@ Expense.belongsTo(User);
 
 User.hasMany(Order);
 Order.belongsTo(User);
+
+User.hasMany(download);
+download.belongsTo(User);
 
 app.listen(3000, () => {
     console.log("Server started on port 3000");
