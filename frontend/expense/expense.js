@@ -1,28 +1,41 @@
 const addIncomeBtn = document.querySelector(".addIncomeBtn");
 const premiumBtn = document.querySelector(".premiumBtn");
-
 const token = localStorage.getItem("token");
+// get current page from local storage
+let currentPage = localStorage.getItem("currentPage");
+if (!currentPage) {
+  currentPage = 1;
+}
 
 // initialize the loading
-// fetch get expense api
 window.addEventListener("DOMContentLoaded", async () => {
+  await fetchExpenses(currentPage);
+  await fetchIsPremium();
+});
+
+// fetch expenses
+async function fetchExpenses(page) {
   try {
-    const response = await axios.get("http://localhost:3000/expenses", {
-      headers: {
-        Authorization: `${token}`,
-      },
-    });
+    const response = await axios.get(
+      "http://localhost:3000/expenses/?page=" + page,
+      {
+        headers: {
+          Authorization: `${token}`,
+        },
+      }
+    );
 
-    for (let i = 0; i < response.data.length; i++) {
-      displayDataOnScreen(response.data[i]);
+    for (let i = 0; i < response.data.expenses.length; i++) {
+      displayDataOnScreen(response.data.expenses[i]);
     }
-
+    setupPagination(response.data.totalPages, page);
     await getTotalIncome_Expense();
   } catch (error) {
     console.log("Error:", error.message);
   }
-
-  // fetch isPremium api
+}
+// fetch isPremium
+async function fetchIsPremium() {
   try {
     const response = await axios.get("http://localhost:3000/isPremium", {
       headers: {
@@ -32,13 +45,36 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (response.data.isPremium) {
       premiumBtn.innerText = "Premium User";
       premiumBtn.disabled = true;
-    }else{
+    } else {
       premiumBtn.innerText = "Get Premium";
     }
   } catch (error) {
     console.log("Error:", error.message);
   }
-});
+}
+
+// pagination
+function setupPagination(totalPages, page) {
+  const paginationElement = document.getElementById("pagination");
+  const itemsContainer = document.querySelector(".items");
+
+  paginationElement.innerHTML = "";
+
+  for (let i = 1; i <= totalPages; i++) {
+    const pageLink = document.createElement("button");
+    pageLink.innerText = i;
+    pageLink.style.padding = "0.5rem 1rem";
+    pageLink.classList.add("page-btn");
+    if (i === page) pageLink.classList.add("active");
+
+    pageLink.addEventListener("click", () => {
+      itemsContainer.innerHTML = "";
+      localStorage.setItem("currentPage", i);
+      fetchExpenses(i);
+    });
+    paginationElement.appendChild(pageLink);
+  }
+}
 
 // function to display data on screen
 function displayDataOnScreen(expenseData) {
