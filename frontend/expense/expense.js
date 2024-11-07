@@ -1,23 +1,27 @@
 const addIncomeBtn = document.querySelector(".addIncomeBtn");
 const premiumBtn = document.querySelector(".premiumBtn");
 const token = localStorage.getItem("token");
-// get current page from local storage
+const itemsContainer = document.querySelector(".items");
+const rowsPerPageDropdown = document.getElementById("rows-per-page");
+
+// add user peferance for pagination
 let currentPage = localStorage.getItem("currentPage");
+let limit = localStorage.getItem("limit") || 10;
 if (!currentPage) {
   currentPage = 1;
 }
 
 // initialize the loading
 window.addEventListener("DOMContentLoaded", async () => {
-  await fetchExpenses(currentPage);
+  await fetchExpenses(currentPage, limit);
   await fetchIsPremium();
 });
 
 // fetch expenses
-async function fetchExpenses(page) {
+async function fetchExpenses(page, limit) {
   try {
     const response = await axios.get(
-      "http://localhost:3000/expenses/?page=" + page,
+      `http://localhost:3000/expenses?page=${page}&limit=${limit}`,
       {
         headers: {
           Authorization: `${token}`,
@@ -28,12 +32,15 @@ async function fetchExpenses(page) {
     for (let i = 0; i < response.data.expenses.length; i++) {
       displayDataOnScreen(response.data.expenses[i]);
     }
+    
     setupPagination(response.data.totalPages, page);
     await getTotalIncome_Expense();
+
   } catch (error) {
     console.log("Error:", error.message);
   }
 }
+
 // fetch isPremium
 async function fetchIsPremium() {
   try {
@@ -53,10 +60,11 @@ async function fetchIsPremium() {
   }
 }
 
-// pagination
-function setupPagination(totalPages, page) {
+// pagination start here
+function setupPagination(totalPages, currentPage) {
   const paginationElement = document.getElementById("pagination");
-  const itemsContainer = document.querySelector(".items");
+
+  let limit = parseInt(localStorage.getItem("limit"), 10) || 10;
 
   paginationElement.innerHTML = "";
 
@@ -65,16 +73,26 @@ function setupPagination(totalPages, page) {
     pageLink.innerText = i;
     pageLink.style.padding = "0.5rem 1rem";
     pageLink.classList.add("page-btn");
-    if (i === page) pageLink.classList.add("active");
+    if (i === currentPage) pageLink.classList.add("active");
 
     pageLink.addEventListener("click", () => {
       itemsContainer.innerHTML = "";
       localStorage.setItem("currentPage", i);
-      fetchExpenses(i);
+      fetchExpenses(i, limit);
     });
+
     paginationElement.appendChild(pageLink);
   }
 }
+rowsPerPageDropdown.addEventListener("change", handleLimitChange);
+
+function handleLimitChange(e) {
+  itemsContainer.innerHTML = "";
+  limit = parseInt(e.target.value);
+  localStorage.setItem("limit", limit);
+  fetchExpenses(currentPage, limit);
+}
+// pagination end here
 
 // function to display data on screen
 function displayDataOnScreen(expenseData) {
