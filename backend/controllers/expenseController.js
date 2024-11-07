@@ -4,6 +4,7 @@ const exModel = require("../models/expenseModel");
 const s3Service = require("../services/S3Service");
 const sequelize = require("../util/db");
 const { json } = require("body-parser");
+const { parse } = require("dotenv");
 
 
 // create new expenses
@@ -41,15 +42,22 @@ exports.createExpense = async (req, res) => {
 
 // get all expenses
 exports.getExpenses = async (req, res) => {
+   const { page = 1, limit = 10 } = req.query;
+  const offset = (page - 1) * limit;
   try {
     const UserId = req.user;
-    const response = await exModel.findAll({ where: { UserId } }, [
-      "id",
-      "amount",
-      "description",
-      "category",
-    ]);
-    res.status(200).json(response);
+    const response = await exModel.findAndCountAll({
+      where: { UserId },
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [["createdAt", "DESC"]],
+    },);
+    res.status(200).json({
+      expenses: response.rows,
+      totalPages: Math.ceil(response.count / limit),
+      currentPage: page,
+      totalExpenses: response.count,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
