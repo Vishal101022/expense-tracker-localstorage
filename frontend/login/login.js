@@ -23,6 +23,7 @@ async function handerFormSubmit(e) {
     const response = await axios.post("http://localhost:3000/login", loginDetails);
     localStorage.setItem("token", response.data.token);
     localStorage.removeItem("currentPage");
+    localStorage.removeItem("limit");
     window.location.href = "../expense/expense.html";
      
   } catch (error) {
