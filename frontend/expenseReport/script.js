@@ -38,11 +38,14 @@ fetchIsPremium();
 
 async function fetchExpenses() {
   try {
-    const response = await axios.get("http://localhost:3000/expenses/", {
-      headers: {
-        Authorization: `${token}`,
-      },
-    });
+    const response = await axios.get(
+      "http://localhost:3000/expenses/?limit=100",
+      {
+        headers: {
+          Authorization: `${token}`,
+        },
+      }
+    );
     const userResponse = await axios.get("http://localhost:3000/users", {
       headers: {
         Authorization: `${token}`,
@@ -51,7 +54,7 @@ async function fetchExpenses() {
     const tableBody = document.getElementById("table-body");
     tableBody.innerHTML = "";
 
-    response.data.forEach((expense) => {
+    response.data.expenses.forEach((expense) => {
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${expense.updatedAt.split("T")[0]}</td>
