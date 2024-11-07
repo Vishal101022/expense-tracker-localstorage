@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="expense.css" />
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <title>Expense Tracker</title>
   </head>
   <body>
@@ -16,13 +16,15 @@
           <a href="/frontend/login/login.html">Logout</a>
         </div>
         <div class="button premium">
-          <button class="premiumBtn" >Premium</button>
+          <button class="premiumBtn">Premium</button>
         </div>
         <div class="button lederboard">
           <a href="/frontend/lederboard/lederboard.html">Lederboard</a>
         </div>
         <div class="button expenseReport">
-           <a href="/frontend/expenseReport/expenseReport.html">Expense Report</a>
+          <a href="/frontend/expenseReport/expenseReport.html"
+            >Expense Report</a
+          >
         </div>
       </div>
     </div>
@@ -76,7 +78,19 @@
         </form>
       </div>
     </div>
-    <div id="pagination"></div>
+    <!-- pagination populated here-->
+    <div class="= pagination-container">
+      <span id="pagination"></span>
+      <span id="rowContainer">
+        <label for="rows-per-page">row per page:</label>
+        <select name="rows" id="rows-per-page">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </span>
+    </div>
   </body>
   <script src="expense.js"></script>
   <script src="purchase.js"></script>
@@ -85,6 +99,8 @@
     ="stylesheet"
     href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
   />
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </html>
