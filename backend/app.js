@@ -2,6 +2,12 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const db = require("./util/db");
+const helmet = require('helmet');
+const dotenv = require("dotenv");
+dotenv.config();
+const port = process.env.PORT || 3000;
+const morgan = require("morgan");
+const fs = require("fs");
 // routes
 const expenseRouter = require("./routes/expenseRoutes");
 const userRouter = require("./routes/userRoutes");
@@ -16,6 +22,12 @@ const User = require("./models/userModel");
 const Expense = require("./models/expenseModel");
 const Order = require("./models/orderModel");
 const download = require("./models/download");
+const path = require("path");
+
+const accessLogStream = fs.createWriteStream(
+    path.join(__dirname, "access.log"),
+    { flags: "a" }  ,
+);
 
 const corsOptions = {
     origin: [
@@ -28,6 +40,9 @@ const corsOptions = {
 }
 
 const app = express();
+
+app.use(helmet());
+app.use(morgan("combined", { stream: accessLogStream }));
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use('/', expenseRouter);
@@ -60,6 +75,6 @@ Order.belongsTo(User);
 User.hasMany(download);
 download.belongsTo(User);
 
-app.listen(3000, () => {
+app.listen(port, () => {
     console.log("Server started on port 3000");
 })
