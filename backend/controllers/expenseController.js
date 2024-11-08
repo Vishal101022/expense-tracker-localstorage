@@ -3,8 +3,6 @@ const downloadModel = require("../models/download");
 const exModel = require("../models/expenseModel");
 const s3Service = require("../services/S3Service");
 const sequelize = require("../util/db");
-const { json } = require("body-parser");
-const { parse } = require("dotenv");
 
 
 // create new expenses
