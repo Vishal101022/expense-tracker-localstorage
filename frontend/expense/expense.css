@@ -296,6 +296,4 @@ textarea{
   cursor: pointer;
   outline: none;
   width: 4rem;
-  position: relative;
-  z-index: 1;
 }
