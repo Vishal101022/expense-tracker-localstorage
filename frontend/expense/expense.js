@@ -33,7 +33,7 @@ async function fetchExpenses(page, limit) {
       displayDataOnScreen(response.data.expenses[i]);
     }
     
-    setupPagination(response.data.totalPages, page);
+    setupPagination(response.data.totalPages, response.data.currentPage);
     await getTotalIncome_Expense();
 
   } catch (error) {
@@ -72,9 +72,9 @@ function setupPagination(totalPages, currentPage) {
     const pageLink = document.createElement("button");
     pageLink.innerText = i;
     pageLink.style.padding = "0.5rem 1rem";
-    pageLink.classList.add("page-btn");
-    if (i === currentPage) pageLink.classList.add("active");
-
+    if(i == currentPage){
+      pageLink.style.backgroundColor = "#daf9f9";
+    }
     pageLink.addEventListener("click", () => {
       itemsContainer.innerHTML = "";
       localStorage.setItem("currentPage", i);
@@ -84,13 +84,14 @@ function setupPagination(totalPages, currentPage) {
     paginationElement.appendChild(pageLink);
   }
 }
+
 rowsPerPageDropdown.addEventListener("change", handleLimitChange);
 
 function handleLimitChange(e) {
   itemsContainer.innerHTML = "";
   limit = parseInt(e.target.value);
   localStorage.setItem("limit", limit);
-  fetchExpenses(currentPage, limit);
+  fetchExpenses(1, limit);
 }
 // pagination end here
 
