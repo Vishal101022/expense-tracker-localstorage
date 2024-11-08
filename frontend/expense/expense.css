@@ -29,7 +29,7 @@ body{
     font-size: 1rem;
 }
 
-.button{
+.navlink{
     background-color: #a8dadc;
     color: #1d3557;
     text-decoration: none;
@@ -282,24 +282,12 @@ textarea{
   gap: 0.5rem;
 }
 
-.page-btn {
-  padding: 0.5rem 1rem;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.page-btn.active {
-  background-color: #007bff;
-  color: white;
-}
-
 #rowContainer {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
+
 
 #rows-per-page {
   padding: 0.25rem;
