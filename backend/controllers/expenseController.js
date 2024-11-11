@@ -4,14 +4,16 @@ const exModel = require("../models/expenseModel");
 const s3Service = require("../services/S3Service");
 const sequelize = require("../util/db");
 
-
 // create new expenses
 exports.createExpense = async (req, res) => {
   const { amount, description, category } = req.body;
   const UserId = req.user;
 
   try {
-    const user = await userModel.findOne({ where: { id: UserId } });
+    const user = await userModel.findOne({
+      attributes: ["totalexpense"],
+      where: { id: UserId },
+    });
     const updatedTotalExpense =
       parseFloat(user.totalexpense) + parseFloat(amount);
 
@@ -40,7 +42,7 @@ exports.createExpense = async (req, res) => {
 
 // get all expenses
 exports.getExpenses = async (req, res) => {
-   const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 10 } = req.query;
   const offset = (page - 1) * limit;
   try {
     const UserId = req.user;
@@ -49,7 +51,7 @@ exports.getExpenses = async (req, res) => {
       limit: parseInt(limit),
       offset: parseInt(offset),
       order: [["createdAt", "DESC"]],
-    },);
+    });
     res.status(200).json({
       expenses: response.rows,
       totalPages: Math.ceil(response.count / limit),
@@ -72,7 +74,10 @@ exports.deleteExpense = async (req, res) => {
       return res.status(404).json({ message: "Expense not found" });
     }
 
-    const user = await userModel.findOne({ where: { id: UserId } });
+    const user = await userModel.findOne({
+      attributes: ["totalexpense"],
+      where: { id: UserId },
+    });
     const updatedTotalExpense =
       parseFloat(user.totalexpense) - parseFloat(expense.amount);
     try {
@@ -134,7 +139,10 @@ exports.updateTotalIncome = async (req, res) => {
     const { amount } = req.body;
     const UserId = req.user;
 
-    const user = await userModel.findOne({ where: { id: UserId } });
+    const user = await userModel.findOne({
+      attributes: ["totalincome", "totalexpense"],
+      where: { id: UserId },
+    });
     const totalIncome = parseFloat(user.totalincome) + parseFloat(amount);
     try {
       const t = await sequelize.transaction();
@@ -159,7 +167,10 @@ exports.updateTotalIncome = async (req, res) => {
 exports.getTotals = async (req, res) => {
   try {
     const UserId = req.user;
-    const user = await userModel.findOne({ where: { id: UserId } });
+    const user = await userModel.findOne({
+      attributes: ["totalincome", "totalexpense"],
+      where: { id: UserId },
+    });
     const totalIncome = parseFloat(user.totalincome);
     const totalExpense = parseFloat(user.totalexpense);
     res.status(200).json({ totalIncome, totalExpense });
@@ -167,7 +178,6 @@ exports.getTotals = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 exports.postexpenseDownload = async (req, res) => {
   const t = await sequelize.transaction();
@@ -178,7 +188,7 @@ exports.postexpenseDownload = async (req, res) => {
     expenseData = JSON.stringify(result);
 
     const filename = `Expense${UserId}/${new Date().toISOString()}.txt`;
-    const url= await s3Service.uploadFileToS3(expenseData, filename);
+    const url = await s3Service.uploadFileToS3(expenseData, filename);
     await downloadModel.create({ url, UserId }, { transaction: t });
     await t.commit();
     res.status(200).json({ url });
@@ -187,7 +197,7 @@ exports.postexpenseDownload = async (req, res) => {
     console.log(error);
     res.status(500).json({ error: error.message });
   }
-}
+};
 
 exports.getexpenseDownload = async (req, res) => {
   try {
@@ -197,4 +207,4 @@ exports.getexpenseDownload = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}
+};
