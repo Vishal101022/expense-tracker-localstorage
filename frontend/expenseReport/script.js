@@ -2,6 +2,12 @@ const token = localStorage.getItem("token");
 const historyBtn = document.getElementById("history-btn");
 const downloadBtn = document.getElementById("download-btn");
 
+window.addEventListener("DOMContentLoaded", async () => {
+  await fetchIsPremium();
+  historyBtn.addEventListener("click", fetchDownloadHistory);
+  downloadBtn.addEventListener("click", downloadPDF);
+});
+
 // entry point
 // fetch isPremium api
 async function fetchIsPremium() {
@@ -34,7 +40,7 @@ async function fetchIsPremium() {
     }
   }
 }
-fetchIsPremium();
+
 
 async function fetchExpenses() {
   try {
@@ -46,7 +52,7 @@ async function fetchExpenses() {
         },
       }
     );
-    const userResponse = await axios.get("http://localhost:3000/users", {
+    const userResponse = await axios.get("http://localhost:3000/totals", {
       headers: {
         Authorization: `${token}`,
       },
@@ -66,15 +72,15 @@ async function fetchExpenses() {
       tableBody.appendChild(row);
     });
 
-    const { totalincome, totalexpense } = userResponse.data;
-    const savings = totalincome - totalexpense;
+    const { totalIncome, totalExpense } = userResponse.data;
+    const savings = totalIncome - totalExpense;
 
     document.getElementById(
       "total-income"
-    ).innerText = `₹ ${totalincome.toFixed(2)}`;
+    ).innerText = `₹ ${totalIncome.toFixed(2)}`;
     document.getElementById(
       "total-expense"
-    ).innerText = `₹ ${totalexpense.toFixed(2)}`;
+    ).innerText = `₹ ${totalExpense.toFixed(2)}`;
     document.getElementById("savings").innerText = `₹ ${savings.toFixed(2)}`;
   } catch (error) {
     console.error("Error fetching expenses:", error);
@@ -157,6 +163,3 @@ async function postDownloadHistory() {
   }
 }
 
-// event listners
-historyBtn.addEventListener("click", fetchDownloadHistory);
-downloadBtn.addEventListener("click", downloadPDF);
