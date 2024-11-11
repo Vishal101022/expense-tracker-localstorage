@@ -15,7 +15,9 @@ if (!currentPage) {
 window.addEventListener("DOMContentLoaded", async () => {
   await fetchExpenses(currentPage, limit);
   await fetchIsPremium();
+  rowsPerPageDropdown.value = limit;
 });
+
 
 // fetch expenses
 async function fetchExpenses(page, limit) {
@@ -35,7 +37,6 @@ async function fetchExpenses(page, limit) {
     
     setupPagination(response.data.totalPages, response.data.currentPage);
     await getTotalIncome_Expense();
-
   } catch (error) {
     console.log("Error:", error.message);
   }
@@ -64,7 +65,7 @@ async function fetchIsPremium() {
 function setupPagination(totalPages, currentPage) {
   const paginationElement = document.getElementById("pagination");
 
-  let limit = parseInt(localStorage.getItem("limit"), 10) || 10;
+  let limit = parseInt(localStorage.getItem("limit")) || 10;
 
   paginationElement.innerHTML = "";
 
@@ -85,12 +86,16 @@ function setupPagination(totalPages, currentPage) {
   }
 }
 
-rowsPerPageDropdown.addEventListener("change", handleLimitChange);
+
+rowsPerPageDropdown.addEventListener("change", (e) => {
+  handleLimitChange(e);
+});
 
 function handleLimitChange(e) {
   itemsContainer.innerHTML = "";
   limit = parseInt(e.target.value);
   localStorage.setItem("limit", limit);
+  localStorage.setItem("currentPage", 1);
   fetchExpenses(1, limit);
 }
 // pagination end here
