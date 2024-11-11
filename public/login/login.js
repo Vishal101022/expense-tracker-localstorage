@@ -24,7 +24,7 @@ async function handerFormSubmit(e) {
     localStorage.setItem("token", response.data.token);
     localStorage.removeItem("currentPage");
     localStorage.removeItem("limit");
-    window.location.href = "../expense/expense.html";
+    window.location.href = "/public/expense/expense.html";
      
   } catch (error) {
     if (error.response && error.response.status === 401) {
