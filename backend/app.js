@@ -6,8 +6,6 @@ const helmet = require('helmet');
 const dotenv = require("dotenv");
 dotenv.config();
 const port = process.env.PORT || 3000;
-const morgan = require("morgan");
-const fs = require("fs");
 // routes
 const expenseRouter = require("./routes/expenseRoutes");
 const userRouter = require("./routes/userRoutes");
@@ -22,28 +20,22 @@ const User = require("./models/userModel");
 const Expense = require("./models/expenseModel");
 const Order = require("./models/orderModel");
 const download = require("./models/download");
-const path = require("path");
 
-const accessLogStream = fs.createWriteStream(
-    path.join(__dirname, "access.log"),
-    { flags: "a" }  ,
-);
 
-const corsOptions = {
-    origin: [
-        "http://localhost:3000",
-        "http://127.0.0.1:5500"
-    ],
-    credentials: true,
-    method: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"]
-}
+// const corsOptions = {
+//     origin: [
+//         "http://localhost:3000",
+//         "http://127.0.0.1:5500"
+//     ],
+//     credentials: true,
+//     method: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+//     allowedHeaders: ["Content-Type", "Authorization"]
+// }
 
 const app = express();
 
 app.use(helmet());
-app.use(morgan("combined", { stream: accessLogStream }));
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use('/', expenseRouter);
 app.use('/', userRouter);
