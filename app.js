@@ -4,6 +4,7 @@ const cors = require("cors");
 const db = require("./util/db");
 const helmet = require('helmet');
 const dotenv = require("dotenv");
+const path = require("path");
 dotenv.config();
 const port = process.env.PORT || 3000;
 // routes
@@ -22,18 +23,18 @@ const Order = require("./models/orderModel");
 const download = require("./models/download");
 
 
-// const corsOptions = {
-//     origin: [
-//         "http://localhost:3000",
-//         "http://127.0.0.1:5500"
-//     ],
-//     credentials: true,
-//     method: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-//     allowedHeaders: ["Content-Type", "Authorization"]
-// }
+const corsOptions = {
+    origin: [
+        "http://localhost:3000",
+        "http://127.0.0.1:5500"
+    ],
+    credentials: true,
+    method: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}
 
 const app = express();
-
+app.use(express.static('public'));
 app.use(helmet());
 app.use(cors());
 app.use(bodyParser.json());
