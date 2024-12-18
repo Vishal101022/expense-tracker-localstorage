@@ -2,7 +2,6 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const db = require("./util/db");
-const helmet = require('helmet');
 const dotenv = require("dotenv");
 const path = require("path");
 dotenv.config();
@@ -35,7 +34,6 @@ const corsOptions = {
 
 const app = express();
 app.use(express.static('public'));
-app.use(helmet());
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/', expenseRouter);
