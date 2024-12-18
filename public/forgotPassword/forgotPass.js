@@ -36,4 +36,3 @@ forgot.addEventListener("click", async (e) => {
   }
 });
 
-window.addEventListener("DOMContentLoaded", (e) => {});
